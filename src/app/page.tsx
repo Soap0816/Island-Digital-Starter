@@ -1,69 +1,242 @@
-import Image from "next/image";
+import { ArrowRight, Clock, Mail, MapPin, Phone } from "lucide-react";
+import type { ReactNode } from "react";
 
-export default function Home() {
+import { MotionShowcase } from "@/components/demo/MotionShowcase";
+import { ThemePreview } from "@/components/demo/ThemePreview";
+import { ContactForm } from "@/components/forms/ContactForm";
+import { Grid } from "@/components/layout/Grid";
+import { Section } from "@/components/layout/Section";
+import { Split } from "@/components/layout/Split";
+import { Magnetic, Marquee, Reveal, RevealGroup, RevealItem } from "@/components/motion";
+import { CTA } from "@/components/sections/CTA";
+import { Hero } from "@/components/sections/Hero";
+import { ButtonLink } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { ImageCard } from "@/components/ui/ImageCard";
+import { ModalTrigger } from "@/components/ui/Modal";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { contactServiceOptions, heroImage, marqueeItems, projects, services } from "@/data/demo";
+import { siteConfig } from "@/data/site";
+import { telHref } from "@/lib/utils";
+
+/*
+ * Demo homepage: shows every starter component in context.
+ * For a client project, replace the sections below with the client's content.
+ */
+export default function HomePage() {
+  const { contact, whatsapp } = siteConfig;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <Hero
+        eyebrow="Island Digital starter"
+        title="Clean foundations for websites that convert"
+        description="A reusable Next.js kit with themeable components, accessible motion and a single config file for every new client."
+        image={heroImage}
+        actions={
+          <>
+            <Magnetic>
+              <ButtonLink href="#contact" size="lg" trailingIcon={<ArrowRight aria-hidden />}>
+                Start a project
+              </ButtonLink>
+            </Magnetic>
+            <ButtonLink href="#services" size="lg" variant="outline">
+              Explore components
+            </ButtonLink>
+          </>
+        }
+      >
+        <p className="text-sm text-muted-foreground">Next.js 16 · Tailwind CSS 4 · Motion · TypeScript</p>
+      </Hero>
+
+      <Section spacing="sm" container={false} className="border-y border-border">
+        <Marquee label="Industries we design for" duration={40}>
+          {marqueeItems.map((item) => (
+            <span key={item} className="text-display flex items-center gap-8 pr-8 text-2xl text-muted-foreground md:text-3xl">
+              {item}
+              <span aria-hidden className="size-1.5 rounded-full bg-accent" />
+            </span>
+          ))}
+        </Marquee>
+      </Section>
+
+      <Section id="services" aria-labelledby="services-title">
+        <div className="flex flex-col gap-12 md:gap-16">
+          <SectionHeading
+            id="services-title"
+            eyebrow="Services"
+            title="Everything a small business site needs"
+            description="Cards, grids and headings are theme-aware primitives. Swap the content, keep the structure."
+          />
+          <RevealGroup>
+            <Grid cols={3}>
+              {services.map((service) => (
+                <RevealItem key={service.title}>
+                  <Card icon={<service.icon />} title={service.title} description={service.description} interactive />
+                </RevealItem>
+              ))}
+            </Grid>
+          </RevealGroup>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+      </Section>
+
+      <Section id="work" tone="muted" aria-labelledby="work-title">
+        <div className="flex flex-col gap-12 md:gap-16">
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <SectionHeading
+              id="work-title"
+              eyebrow="Selected work"
+              title="Image cards for portfolios, menus and inventory"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <Reveal variant="fade">
+              <ButtonLink href="#contact" variant="link" trailingIcon={<ArrowRight aria-hidden />}>
+                Discuss your project
+              </ButtonLink>
+            </Reveal>
+          </div>
+          <Grid cols={3}>
+            {projects.map((project, index) => (
+              <Reveal key={project.title} variant="up" delay={index * 0.1}>
+                <ImageCard
+                  image={project.image}
+                  eyebrow={project.category}
+                  title={project.title}
+                  href={project.href}
+                  layout={index === 1 ? "overlay" : "below"}
+                />
+              </Reveal>
+            ))}
+          </Grid>
         </div>
-      </main>
-    </div>
+      </Section>
+
+      <Section id="styles" aria-labelledby="styles-title">
+        <div className="flex flex-col gap-12">
+          <SectionHeading
+            id="styles-title"
+            eyebrow="Style presets"
+            title="One codebase, six visual directions"
+            description={
+              <>
+                Click a preset to preview it on this page. For a real project, set{" "}
+                <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-[0.9em] text-foreground">theme.preset</code> in{" "}
+                <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-[0.9em] text-foreground">src/data/site.ts</code>.
+              </>
+            }
+          />
+          <Reveal variant="up">
+            <ThemePreview initial={siteConfig.theme.preset} />
+          </Reveal>
+        </div>
+      </Section>
+
+      <Section id="motion" tone="muted" aria-labelledby="motion-title">
+        <div className="flex flex-col gap-12">
+          <SectionHeading
+            id="motion-title"
+            eyebrow="Motion toolkit"
+            title="Subtle animation, respectful of reduced motion"
+            description="Every utility reads its timing from the active theme and turns off movement for visitors who ask for less."
+          />
+          <MotionShowcase />
+        </div>
+      </Section>
+
+      <CTA
+        eyebrow="Ready when you are"
+        title="Let's plan your next website"
+        description="Book a free 20-minute call to talk through goals, timeline and budget."
+        actions={
+          <>
+            <ModalTrigger
+              label="Book a discovery call"
+              buttonProps={{ size: "lg" }}
+              title="Book a discovery call"
+              description="Pick whichever is easiest. We usually reply within one business day."
+              size="sm"
+            >
+              <div className="flex flex-col gap-3">
+                <ButtonLink href={`mailto:${contact.email}`} variant="secondary" fullWidth leadingIcon={<Mail aria-hidden />}>
+                  Email {contact.email}
+                </ButtonLink>
+                {contact.phone && (
+                  <ButtonLink href={telHref(contact.phone)} variant="outline" fullWidth leadingIcon={<Phone aria-hidden />}>
+                    Call {contact.phone}
+                  </ButtonLink>
+                )}
+              </div>
+            </ModalTrigger>
+            <ButtonLink href={`mailto:${contact.email}`} size="lg" variant="outline">
+              Email us
+            </ButtonLink>
+          </>
+        }
+      />
+
+      <Section id="contact" aria-labelledby="contact-title" className="pt-0 md:pt-0">
+        <Split
+          ratio="2:3"
+          align="start"
+          start={
+            <div className="flex flex-col gap-10">
+              <SectionHeading
+                id="contact-title"
+                eyebrow="Contact"
+                title="Tell us about your project"
+                description="Fill in the form and we'll get back to you with next steps."
+              />
+              <Reveal variant="up" delay={0.2}>
+                <ul className="flex flex-col gap-4 text-sm">
+                  <ContactRow icon={<Mail />} label="Email">
+                    <a href={`mailto:${contact.email}`} className="hover:underline">
+                      {contact.email}
+                    </a>
+                  </ContactRow>
+                  {contact.phone && (
+                    <ContactRow icon={<Phone />} label="Phone">
+                      <a href={telHref(contact.phone)} className="hover:underline">
+                        {contact.phone}
+                      </a>
+                    </ContactRow>
+                  )}
+                  {contact.address && (
+                    <ContactRow icon={<MapPin />} label="Studio">
+                      {contact.address.street}, {contact.address.city}
+                    </ContactRow>
+                  )}
+                  {contact.hours?.map((slot) => (
+                    <ContactRow key={slot.label} icon={<Clock />} label={slot.label}>
+                      {slot.value}
+                    </ContactRow>
+                  ))}
+                </ul>
+              </Reveal>
+            </div>
+          }
+          end={
+            <Reveal variant="up" className="rounded-theme border border-border bg-surface p-6 md:p-10">
+              <ContactForm
+                services={contactServiceOptions}
+                whatsapp={whatsapp.enabled ? { number: whatsapp.number, message: whatsapp.defaultMessage } : undefined}
+              />
+            </Reveal>
+          }
+        />
+      </Section>
+    </>
+  );
+}
+
+function ContactRow({ icon, label, children }: { icon: ReactNode; label: string; children: ReactNode }) {
+  return (
+    <li className="flex items-start gap-4">
+      <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-button bg-muted text-accent-text [&_svg]:size-4">
+        {icon}
+      </span>
+      <span className="flex flex-col pt-0.5">
+        <span className="text-muted-foreground">{label}</span>
+        <span className="font-medium">{children}</span>
+      </span>
+    </li>
   );
 }

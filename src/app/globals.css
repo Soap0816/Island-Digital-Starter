@@ -1,26 +1,259 @@
 @import "tailwindcss";
 
+/*
+ * Theme tokens. Defaults below match the "service" preset; the root layout
+ * overrides them inline from src/data/site.ts, so edit colors there, not here.
+ */
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0f172a;
+  --muted: #f4f6f8;
+  --muted-foreground: #4f5d6e;
+  --surface: #ffffff;
+  --border: #e2e7ed;
+  --accent: #0f766e;
+  --accent-foreground: #ffffff;
+  --accent-text: #0f766e;
+  --accent-base: #0f766e;
+  --accent-foreground-base: #ffffff;
+  --inverse: #0f172a;
+  --inverse-foreground: #f8fafc;
+  --font-heading: var(--font-inter);
+  --font-body: var(--font-inter);
+  --heading-weight: 600;
+  --heading-tracking: -0.025em;
+  --heading-transform: none;
+  --radius: 0.875rem;
+  --radius-btn: 0.625rem;
+  --header-height: 4.5rem;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-text: var(--accent-text);
+  --color-inverse: var(--inverse);
+  --color-inverse-foreground: var(--inverse-foreground);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-heading);
+  --radius-theme: var(--radius);
+  --radius-button: var(--radius-btn);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/*
+ * Section tones re-map the tokens, so every component inside a toned section
+ * (text, borders, cards, buttons) adapts without extra props.
+ */
+@layer base {
+  .tone-muted {
+    --background: var(--muted);
+  }
+
+  .tone-inverse,
+  .tone-accent {
+    --muted: color-mix(in oklab, var(--foreground) 8%, var(--background));
+    --muted-foreground: color-mix(in oklab, var(--foreground) 72%, var(--background));
+    --surface: color-mix(in oklab, var(--foreground) 6%, var(--background));
+    --border: color-mix(in oklab, var(--foreground) 16%, var(--background));
+  }
+
+  .tone-inverse {
+    --background: var(--inverse);
+    --foreground: var(--inverse-foreground);
+    --accent-text: color-mix(in oklab, var(--accent-base) 60%, var(--foreground));
+  }
+
+  /* --accent-base / --accent-foreground-base are never re-mapped, so they stay safe to reference here. */
+  .tone-accent {
+    --background: var(--accent-base);
+    --foreground: var(--accent-foreground-base);
+    --accent: var(--accent-foreground-base);
+    --accent-foreground: var(--accent-base);
+    --accent-text: var(--accent-foreground-base);
+  }
+
+  /* Text placed over photography. */
+  .on-image {
+    --foreground: #ffffff;
+    --muted-foreground: rgb(255 255 255 / 0.82);
+    --accent-text: #ffffff;
+  }
+
+  html {
+    scroll-padding-top: var(--header-height);
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--foreground);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+  }
+
+  /* Lock page scroll while a modal <dialog> is open. */
+  html:has(dialog[open]:modal) {
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Heading style driven by the theme (font, weight, tracking, case). */
+@utility text-display {
+  font-family: var(--font-heading), ui-serif, Georgia, serif;
+  font-weight: var(--heading-weight);
+  letter-spacing: var(--heading-tracking);
+  text-transform: var(--heading-transform);
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+@utility eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+@layer components {
+  /* ---------- Native <dialog> (Modal, MobileMenu) ---------- */
+  .dialog {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+    transition:
+      opacity 0.25s ease,
+      transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      overlay 0.3s allow-discrete,
+      display 0.3s allow-discrete;
+  }
+
+  .dialog[open] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .dialog::backdrop {
+    background-color: rgb(0 0 0 / 0);
+    backdrop-filter: blur(0);
+    transition:
+      background-color 0.3s ease,
+      backdrop-filter 0.3s ease,
+      overlay 0.3s allow-discrete,
+      display 0.3s allow-discrete;
+  }
+
+  .dialog[open]::backdrop {
+    background-color: rgb(0 0 0 / 0.55);
+    backdrop-filter: blur(4px);
+  }
+
+  @starting-style {
+    .dialog[open] {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+
+    .dialog[open]::backdrop {
+      background-color: rgb(0 0 0 / 0);
+      backdrop-filter: blur(0);
+    }
+  }
+
+  .dialog-sheet {
+    transform: translateY(-8px);
+  }
+
+  @starting-style {
+    .dialog-sheet[open] {
+      transform: translateY(-8px);
+    }
+  }
+
+  /* ---------- Initial loading screen (CSS only, works before hydration) ---------- */
+  .loading-screen {
+    animation: loading-screen-out 0.6s cubic-bezier(0.65, 0, 0.35, 1) 0.9s forwards;
+  }
+
+  .loading-screen__mark {
+    animation: loading-mark-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+  }
+
+  .loading-screen__bar {
+    transform-origin: left;
+    animation: loading-bar 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
+  }
+
+  /* ---------- Floating action button entrance ---------- */
+  .fab-enter {
+    animation: fab-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) 1.4s both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dialog,
+    .dialog::backdrop {
+      transform: none;
+      transition-duration: 0.01ms;
+    }
+
+    .loading-screen {
+      animation-duration: 0.2s;
+      animation-delay: 0.2s;
+    }
+
+    .loading-screen__mark,
+    .loading-screen__bar,
+    .fab-enter {
+      animation: none;
+    }
+  }
+}
+
+@keyframes loading-screen-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes loading-mark-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5em);
+  }
+}
+
+@keyframes loading-bar {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes fab-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.9);
+  }
 }
